@@ -5,72 +5,133 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redux</title>
+  <title>Desafio Redux</title>
+  <script src="./immer.umd.production.min.js"></script>
   <script src="./redux.min.js"></script>
+
+  <style>
+    * {
+      padding: 0px;
+      margin: 0px;
+      box-sizing: border-box;
+      font-family: Roboto;
+    }
+
+    main {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #2E8BC0;
+    }
+
+    .card {
+      width: 95%;
+      max-width: 320px;
+      background-color: #0C2D48;
+      border-radius: 10px;
+      color: #0C2D48;
+      box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+      padding: 20px;
+    }
+
+    .card div {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .card h1 {
+      color: #B1D4E0;
+      margin-bottom: 20px;
+    }
+
+    .card p {
+      width: 48%;
+      height: 100px;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      background-color: #B1D4E0;
+      border-radius: 10px;
+      font-weight: bold;
+      justify-content: center;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .card p:first-of-type {
+      width: 100%;
+    }
+
+    .card p span {
+      display: block;
+      margin: 5px 20px;
+      font-size: 30px;
+    }
+
+    .card p:first-of-type span {
+      font-size: 23px;
+    }
+  </style>
 </head>
 
 <body>
 
-  <div>
-    <h1>Total: <span id="total">0</span></h1>
-    <button id="incrementar">Incrementar</button>
-  </div>
-  <script>
+  <main>
+    <div class="card">
+      <div>
+        <h1 id="nome">Nome</h1>
+        <p>
+          E-mail
+          <span id="email"></span>
+        </p>
+        <p>
+          Dias restantes
+          <span id="tempo"></span>
+        </p>
+        <p>
+          Aulas completas
+          <span id="aulasCompletas"></span>
+        </p>
+      </div>
 
-    // CONSTANTES
-    const INCREMENTAR = 'INCREMENTAR';
-    const SOMAR = 'SOMAR';
+    </div>
+  </main>
 
-    const initialState = {
-      nome: 'Lucas',
-      idade: 22,
-      id: 199
-    };
-
-    const somar = (val) => {
-      return { type: SOMAR, payload: val }
-    }
-
-    const incrementar = (val) => {
-      return { type: INCREMENTAR }
-    }
-
-    function reducer(state = initialState, action) {
-      if (action.type === INCREMENTAR) {
-        return state + 1;
-      }
-      if (action.type === SOMAR) {
-        return state.idade + action.payload;
-      }
-      return state;
-    }
-
-    const store = Redux.createStore(reducer);
-
-    store.dispatch(somar(25));
-
-    const total = document.getElementById("total");
+  <script type="module">
+    import store from './store/storeConfigure.js';
+    import { incrementarTempo, reduzirTempo, modificarEmail } from './store/modules/aluno.js';
+    import { completarAula, completarCurso, resetarCurso } from './store/modules/aulas.js';
 
     const render = () => {
-      const state = store.getState();
-      total.innerHTML = state;
-    }
+      const { aluno, aulas } = store.getState();
 
-    const render2 = () => {
-      const state = store.getState();
-      console.log(state);
+      const nomeEl = document.getElementById('nome');
+      const emailEl = document.getElementById('email');
+      const tempoEl = document.getElementById('tempo');
+      const aulasEl = document.getElementById('aulasCompletas');
+
+      const aulasCompletas = aulas.filter(element => element.completa).length;
+
+      nomeEl.innerHTML = aluno.nome;
+      emailEl.innerHTML = aluno.email;
+      tempoEl.innerHTML = aluno.diasRestantes;
+      aulasEl.innerHTML = aulasCompletas;
     }
 
     render();
-    render2();
 
     store.subscribe(render);
 
-    const subscriber2 = store.subscribe(render2);
-    subscriber2();
+    store.dispatch(incrementarTempo());
+    store.dispatch(reduzirTempo());
+    store.dispatch(modificarEmail('lucas@gmail.com'));
+    store.dispatch(completarAula(2));
+    store.dispatch(completarCurso());
+    store.dispatch(resetarCurso());
 
-    const button = document.getElementById('incrementar');
-    button.addEventListener('click', () => store.dispatch(incrementar()));
   </script>
 </body>
 
